@@ -14,7 +14,8 @@
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "/static/$1"
+      "headers": { "cache-control": "public,max-age=31536000,immutable" },
+      "continue": true
     },
     {
       "src": "/favicon.ico",
@@ -25,16 +26,11 @@
       "dest": "/manifest.json"
     },
     {
-      "src": "/logo192.png",
-      "dest": "/logo192.png"
-    },
-    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
   ],
   "env": {
-    "NODE_OPTIONS": "--openssl-legacy-provider",
-    "CI": "false"
+    "NODE_OPTIONS": "--openssl-legacy-provider"
   }
 } 

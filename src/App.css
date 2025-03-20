@@ -1,0 +1,368 @@
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.5;
+  color: #333;
+  background-color: #f5f7fa;
+}
+
+.app-container {
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+/* Card Components */
+.card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 20px 20px 10px 20px;
+}
+
+.card-content {
+  padding: 10px 20px 20px 20px;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.card-description {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+/* Button Component */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #4338ca;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid #e5e7eb;
+  color: #4b5563;
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: #f9fafb;
+}
+
+.btn-destructive {
+  background-color: #ef4444;
+  color: white;
+}
+
+.btn-destructive:hover:not(:disabled) {
+  background-color: #dc2626;
+}
+
+/* Progress Component */
+.progress-container {
+  height: 12px;
+  background-color: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #4f46e5;
+  transition: width 0.3s ease;
+}
+
+/* Tabs Components */
+.tabs {
+  width: 100%;
+}
+
+.tabs-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.tab-trigger {
+  padding: 10px;
+  background-color: #f3f4f6;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  text-align: center;
+  color: #6b7280;
+  transition: all 0.2s;
+}
+
+.tab-trigger.active {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.tab-trigger:hover:not(.active) {
+  background-color: #e5e7eb;
+}
+
+.tab-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Progress Section */
+.progress-section {
+  margin-bottom: 24px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.progress-label {
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.progress-percentage {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Activities Tab */
+.activities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.activity-card {
+  position: relative;
+}
+
+.activity-color-bar {
+  height: 8px;
+  width: 100%;
+}
+
+.activity-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.activity-points {
+  margin-left: auto;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.activity-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.counter-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.counter-value {
+  width: 40px;
+  text-align: center;
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.focus-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.save-button-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #10b981;
+}
+
+.save-button:hover {
+  background-color: #059669;
+}
+
+/* Focus Tab */
+.focus-options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.focus-option-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  height: auto;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+.focus-option-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.focus-option-subtitle {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.focus-active-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 32px;
+}
+
+.focus-timer {
+  font-size: 4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.focus-description {
+  text-align: center;
+  max-width: 400px;
+}
+
+.end-focus-button {
+  margin-top: 16px;
+}
+
+/* History Tab */
+.chart-container {
+  margin-bottom: 32px;
+}
+
+.history-log-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.history-table-container {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th,
+.history-table td {
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.history-table th {
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.goal-met,
+.goal-missed {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.goal-met {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.goal-missed {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .activities-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .focus-options-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tabs-list {
+    grid-template-columns: 1fr;
+  }
+}

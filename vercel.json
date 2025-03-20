@@ -31,6 +31,7 @@
     }
   ],
   "env": {
-    "NODE_OPTIONS": "--openssl-legacy-provider"
+    "NODE_OPTIONS": "--openssl-legacy-provider",
+    "CI": "false"
   }
 } 

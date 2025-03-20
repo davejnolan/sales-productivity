@@ -5,7 +5,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { CheckCircle, Clock, MessageCircle, Phone, BookOpen, Calendar, Target, User } from 'lucide-react';
 import './Profile.css';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../firebase.config'; // Adjust this path based on where your firebase config is located
+import { db } from '../firebase.config';
 
 // Simple UI components
 const Card = ({ children, className = '' }) => (
@@ -33,9 +33,61 @@ const Progress = ({ value }) => (
   </div>
 );
 
-function Profile() {
+const FlippableCard = ({ front, back, isFlipped, onClick }) => (
+  <div className={`flippable-card ${isFlipped ? 'flipped' : ''}`}>
+    <div className="card-inner" onClick={onClick}>
+      <div className="card-front">
+        <div className="card-content-wrapper">
+          {front}
+        </div>
+      </div>
+      <div className="card-back">
+        <div className="card-content-wrapper">
+          {back}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Activity details configuration
+const activityDetails = {
+  prospects: {
+    howTo: 'Add new prospects to your pipeline. Each contact counts as one unit.',
+    pointsExplained: '0.1 points per contact added',
+    quote: '"Every new prospect is a potential partnership."'
+  },
+  calls: {
+    howTo: 'Make outbound calls to potential customers. Each completed call counts as one unit.',
+    pointsExplained: '1 point per call',
+    quote: '"Every \'no\' brings you closer to a \'yes\'."'
+  },
+  messages: {
+    howTo: 'Send personalized messages to prospects or customers. Track each meaningful message sent.',
+    pointsExplained: '0.2 points per message',
+    quote: '"The fortune is in the follow-up."'
+  },
+  meetings: {
+    howTo: 'Schedule and confirm meetings with potential clients or partners.',
+    pointsExplained: '1 point per scheduled meeting',
+    quote: '"Success is when preparation meets opportunity."'
+  },
+  opportunities: {
+    howTo: 'Create and qualify new sales opportunities.',
+    pointsExplained: '1 point per qualified opportunity',
+    quote: '"Quality opportunities lead to successful partnerships."'
+  },
+  development: {
+    howTo: 'Invest time in improving sales skills, industry knowledge, or product expertise.',
+    pointsExplained: '1 point max per day for 30+ minutes of focused learning',
+    quote: '"Invest in yourself. Your growth is your competitive advantage."'
+  }
+};
+
+export default function Profile() {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  
   const [activityCounts, setActivityCounts] = useState({
     prospects: 0,
     calls: 0,
@@ -44,7 +96,9 @@ function Profile() {
     opportunities: 0,
     development: 0
   });
+  
   const [history, setHistory] = useState([]);
+  const [flippedCards, setFlippedCards] = useState({});
   const [focusSession, setFocusSession] = useState({
     active: false,
     activity: null,
@@ -72,7 +126,10 @@ function Profile() {
           const userDoc = await getDoc(userRef);
           if (userDoc.exists()) {
             const data = userDoc.data();
-            setActivityCounts(data.activityCounts || activityCounts);
+            setActivityCounts(prev => ({
+              ...prev,
+              ...data.activityCounts
+            }));
             setHistory(data.history || []);
           }
         } catch (error) {
@@ -278,55 +335,99 @@ function Profile() {
           </div>
 
           <div className="activities-grid">
-            {activities.map((activity) => (
-              <Card key={activity.id} className="activity-card">
-                <div className="activity-color-bar" style={{ backgroundColor: activity.color }}></div>
-                <CardHeader>
-                  <div className="activity-header">
-                    <div className="activity-icon" style={{ backgroundColor: `${activity.color}20` }}>
-                      {React.cloneElement(activity.icon, { color: activity.color, size: 20 })}
+            {activities.map((activity) => {
+              const details = activityDetails[activity.id];
+              const isFlipped = flippedCards[activity.id] || false;
+              
+              const frontContent = (
+                <Card className="activity-card">
+                  <div className="activity-color-bar" style={{ backgroundColor: activity.color }}></div>
+                  <CardHeader>
+                    <div className="activity-header">
+                      <div className="activity-icon" style={{ backgroundColor: `${activity.color}20` }}>
+                        {React.cloneElement(activity.icon, { color: activity.color, size: 20 })}
+                      </div>
+                      <div>
+                        <CardTitle>{activity.name}</CardTitle>
+                        <CardDescription>{activity.unit}</CardDescription>
+                      </div>
+                      <div className="activity-points">
+                        {calculatePoints(activity.id, activityCounts[activity.id]).toFixed(1)}pt
+                      </div>
                     </div>
-                    <div>
-                      <CardTitle>{activity.name}</CardTitle>
-                      <CardDescription>{activity.unit}</CardDescription>
-                    </div>
-                    <div className="activity-points">
-                      {calculatePoints(activity.id, activityCounts[activity.id]).toFixed(1)}pt
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="activity-controls">
-                    <div className="counter-controls">
-                      <Button 
-                        variant="outline"
-                        onClick={() => handleDecrement(activity.id)}
-                        disabled={activityCounts[activity.id] <= 0}
-                      >
-                        -
-                      </Button>
-                      <div className="counter-value">
-                        {activityCounts[activity.id]}
+                  </CardHeader>
+                  <CardContent>
+                    <div className="activity-controls">
+                      <div className="counter-controls">
+                        <Button 
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDecrement(activity.id);
+                          }}
+                          disabled={activityCounts[activity.id] <= 0}
+                        >
+                          -
+                        </Button>
+                        <div className="counter-value">
+                          {activityCounts[activity.id]}
+                        </div>
+                        <Button 
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleIncrement(activity.id);
+                          }}
+                        >
+                          +
+                        </Button>
                       </div>
                       <Button 
                         variant="outline"
-                        onClick={() => handleIncrement(activity.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          startFocusSession(activity.id);
+                        }}
+                        disabled={focusSession.active}
+                        className="focus-button"
                       >
-                        +
+                        <Clock size={16} /> Focus
                       </Button>
                     </div>
-                    <Button 
-                      variant="outline"
-                      onClick={() => startFocusSession(activity.id)}
-                      disabled={focusSession.active}
-                      className="focus-button"
-                    >
-                      <Clock size={16} /> Focus
-                    </Button>
+                  </CardContent>
+                </Card>
+              );
+
+              const backContent = (
+                <Card className="activity-card">
+                  <div className="activity-color-bar" style={{ backgroundColor: activity.color }}></div>
+                  <div className="activity-details">
+                    <div>
+                      <h4>How to Earn Points</h4>
+                      <p>{details.howTo}</p>
+                      <h4>Points Structure</h4>
+                      <p>{details.pointsExplained}</p>
+                    </div>
+                    <div className="activity-quote">
+                      {details.quote}
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                </Card>
+              );
+
+              return (
+                <FlippableCard
+                  key={activity.id}
+                  front={frontContent}
+                  back={backContent}
+                  isFlipped={isFlipped}
+                  onClick={() => setFlippedCards(prev => ({
+                    ...prev,
+                    [activity.id]: !prev[activity.id]
+                  }))}
+                />
+              );
+            })}
           </div>
           
           <div className="save-button-container">
@@ -339,12 +440,24 @@ function Profile() {
             <div className="focus-session-overlay">
               <div className="focus-session-content">
                 <h3>Focus Session</h3>
+                <div className="focus-activity-name">
+                  {React.cloneElement(
+                    activities.find(a => a.id === focusSession.activity)?.icon || <Clock />,
+                    { size: 20, color: 'white' }
+                  )}
+                  <span>
+                    {activities.find(a => a.id === focusSession.activity)?.name || 'Activity'}
+                  </span>
+                </div>
                 <div className="focus-timer">
                   {formatTime(focusSession.timeRemaining)}
                 </div>
                 <Progress 
                   value={(focusSession.timeRemaining / focusSession.duration) * 100} 
                 />
+                <div className="focus-quote">
+                  {activityDetails[focusSession.activity]?.quote || '"Focus on being productive instead of busy."'}
+                </div>
                 <Button 
                   variant="destructive"
                   onClick={endFocusSession}
@@ -389,6 +502,4 @@ function Profile() {
       </Card>
     </div>
   );
-}
-
-export default Profile; 
+} 

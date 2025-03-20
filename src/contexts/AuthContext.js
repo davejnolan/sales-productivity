@@ -16,6 +16,7 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   function signup(email, password) {
     return createUserWithEmailAndPassword(auth, email, password);
@@ -30,24 +31,42 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
+    console.log('AuthProvider mounted');
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log('Auth state changed:', user ? 'User logged in' : 'No user');
       setCurrentUser(user);
+      setLoading(false);
+    }, (error) => {
+      console.error('Auth error:', error);
+      setError(error);
       setLoading(false);
     });
 
-    return unsubscribe;
+    return () => {
+      console.log('AuthProvider unmounting');
+      unsubscribe();
+    };
   }, []);
+
+  if (error) {
+    console.error('Auth error state:', error);
+  }
 
   const value = {
     currentUser,
     signup,
     login,
-    logout
+    logout,
+    error
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 } 

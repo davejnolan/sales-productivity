@@ -309,6 +309,82 @@ export default function Profile() {
     }
   };
 
+  const frontContent = (activity) => (
+    <Card className="activity-card">
+      <div className="activity-color-bar" style={{ backgroundColor: activity.color }}></div>
+      <CardHeader>
+        <div className="activity-header">
+          <div className="activity-icon" style={{ backgroundColor: `${activity.color}20` }}>
+            {React.cloneElement(activity.icon, { color: activity.color, size: 20 })}
+          </div>
+          <div>
+            <CardTitle>{activity.name}</CardTitle>
+            <CardDescription>{activity.unit}</CardDescription>
+          </div>
+          <div className="activity-points">
+            {calculatePoints(activity.id, activityCounts[activity.id]).toFixed(1)}pt
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="activity-controls">
+          <div className="counter-controls">
+            <Button 
+              variant="outline"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDecrement(activity.id);
+              }}
+              disabled={activityCounts[activity.id] <= 0}
+            >
+              -
+            </Button>
+            <div className="counter-value">
+              {activityCounts[activity.id]}
+            </div>
+            <Button 
+              variant="outline"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleIncrement(activity.id);
+              }}
+            >
+              +
+            </Button>
+          </div>
+          <Button 
+            variant="outline"
+            onClick={(e) => {
+              e.stopPropagation();
+              startFocusSession(activity.id);
+            }}
+            disabled={focusSession.active}
+            className="focus-button"
+          >
+            <Clock size={16} /> Focus
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const backContent = (activity) => (
+    <Card className="activity-card">
+      <div className="activity-color-bar" style={{ backgroundColor: activity.color }}></div>
+      <div className="activity-details">
+        <div>
+          <h4>How to Earn Points</h4>
+          <p>{activityDetails[activity.id].howTo}</p>
+          <h4>Points Structure</h4>
+          <p>{activityDetails[activity.id].pointsExplained}</p>
+        </div>
+        <div className="activity-quote">
+          {activityDetails[activity.id].quote}
+        </div>
+      </div>
+    </Card>
+  );
+
   return (
     <div className="app-container">
       <div className="header">
@@ -335,99 +411,19 @@ export default function Profile() {
           </div>
 
           <div className="activities-grid">
-            {activities.map((activity) => {
-              const details = activityDetails[activity.id];
-              const isFlipped = flippedCards[activity.id] || false;
-              
-              const frontContent = (
-                <Card className="activity-card">
-                  <div className="activity-color-bar" style={{ backgroundColor: activity.color }}></div>
-                  <CardHeader>
-                    <div className="activity-header">
-                      <div className="activity-icon" style={{ backgroundColor: `${activity.color}20` }}>
-                        {React.cloneElement(activity.icon, { color: activity.color, size: 20 })}
-                      </div>
-                      <div>
-                        <CardTitle>{activity.name}</CardTitle>
-                        <CardDescription>{activity.unit}</CardDescription>
-                      </div>
-                      <div className="activity-points">
-                        {calculatePoints(activity.id, activityCounts[activity.id]).toFixed(1)}pt
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="activity-controls">
-                      <div className="counter-controls">
-                        <Button 
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDecrement(activity.id);
-                          }}
-                          disabled={activityCounts[activity.id] <= 0}
-                        >
-                          -
-                        </Button>
-                        <div className="counter-value">
-                          {activityCounts[activity.id]}
-                        </div>
-                        <Button 
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleIncrement(activity.id);
-                          }}
-                        >
-                          +
-                        </Button>
-                      </div>
-                      <Button 
-                        variant="outline"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          startFocusSession(activity.id);
-                        }}
-                        disabled={focusSession.active}
-                        className="focus-button"
-                      >
-                        <Clock size={16} /> Focus
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-
-              const backContent = (
-                <Card className="activity-card">
-                  <div className="activity-color-bar" style={{ backgroundColor: activity.color }}></div>
-                  <div className="activity-details">
-                    <div>
-                      <h4>How to Earn Points</h4>
-                      <p>{details.howTo}</p>
-                      <h4>Points Structure</h4>
-                      <p>{details.pointsExplained}</p>
-                    </div>
-                    <div className="activity-quote">
-                      {details.quote}
-                    </div>
-                  </div>
-                </Card>
-              );
-
-              return (
+            {activities.map((activity) => (
+              <div key={activity.id}>
                 <FlippableCard
-                  key={activity.id}
-                  front={frontContent}
-                  back={backContent}
-                  isFlipped={isFlipped}
+                  front={frontContent(activity)}
+                  back={backContent(activity)}
+                  isFlipped={flippedCards[activity.id] || false}
                   onClick={() => setFlippedCards(prev => ({
                     ...prev,
                     [activity.id]: !prev[activity.id]
                   }))}
                 />
-              );
-            })}
+              </div>
+            ))}
           </div>
           
           <div className="save-button-container">
